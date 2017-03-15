@@ -1,0 +1,45 @@
+spring:
+  profiles.active: development
+---
+
+spring:
+    profiles: development
+server:
+    address: 127.0.0.1
+    port: 8080
+
+spring.data.elasticsearch:
+    repositories.enabled: true
+
+spring.data.mongodb:
+    host: localhost
+    port: 27017
+    database: document-recommendation
+
+kafka:
+   bootstrap.servers: localhost:9092
+   key.serialize: org.apache.kafka.common.serialization.StringSerializer
+   value.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+   topic: unscored-documents-topic
+
+---
+spring:
+    profiles: test
+server:
+    address: 127.0.0.1
+    port: 8080
+
+spring.data.elasticsearch:
+    repositories.enabled: true
+
+spring.data.mongodb:
+    host: localhost
+    port: 27017
+    database: document-recommendation
+
+kafka:
+   bootstrap.servers: localhost:9092
+   key.serialize: org.apache.kafka.common.serialization.StringSerializer
+   value.serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+   topic: test-topic
+

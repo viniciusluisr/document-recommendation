@@ -1,0 +1,58 @@
+version: '3'
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - "9092:9092"
+    depends_on: 
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_CREATE_TOPICS: unscored-documents-topic:1:1,test-topic:1:1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  mongodb:
+    image: 'bitnami/mongodb:latest'
+    ports:
+      - "27017:27017/tcp"
+
+# ELASTICSEARCH CLUSTER
+  master:
+    image: itzg/elasticsearch
+    environment:
+      TYPE: MASTER
+      UNICAST_HOSTS: master
+      MIN_MASTERS: 1
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        
+  data:
+    image: itzg/elasticsearch
+    environment:
+      TYPE: DATA
+      UNICAST_HOSTS: master
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 60s
+
+  gateway:
+    image: itzg/elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      TYPE: GATEWAY
+      UNICAST_HOSTS: master
+
